@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <title>Pong Game</title>
+       <style>
+        body{
+            margin: 0;
+            padding: 0;
+            background-color: blueviolet;
+        }
+
+        canvas{
+            background-color: aqua;
+            display: block;
+            margin: 0 auto;
+            border: 2px solid white;
+        }
+       </style>
+    </head>
+    <body>
+        <canvas id="PongCanvas" width="800" height="400"></canvas>
+        <script>
+            const canvas = document.getElementById("PongCanvas");
+            const context = canvas.getContext("2d");
+
+            const paddleWidth = 20;
+            const paddleHeight = 100;
+            const ballRadius = 10;
+
+            let playerPaddleY = canvas.height / 2 - paddleHeight / 2;
+            let aiPaddleY = (canvas.height - paddleHeight) / 2;
+
+            let ballX = canvas.width / 2;
+            let ballY = canvas.height / 2;
+            let ballSpeedX = 4;
+            let ballSpeedY = 4;
+
+            function drawGameElements(){
+
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+                context.fillStyle = "white";
+                context.fillRect(0, playerPaddleY, paddleWidth, paddleHeight);
+
+                context.fillStyle = "white";
+                context.fillRect(canvas.width - paddleWidth, aiPaddleY, paddleWidth, paddleHeight);
+
+                context.beginPath();
+                context.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+                context.fillStyle = "red"
+                context.fill();
+                context.closePath();
+            }
+
+            function move(){
+                ballX = ballX + ballSpeedX;
+                ballY = ballY + ballSpeedY;
+
+                if(ballY + ballRadius > canvas.height || ballY - ballRadius < 0){
+                    ballSpeedY = ballSpeedY;
+                }
+
+                if(ballX - ballRadius < paddleWidth){
+                    if(ballY > playerPaddleY && ballY < playerPaddleY + paddleHeight){
+                        ballSpeedX = -ballSpeedX;
+                    }
+                }
+
+                if(ballX + ballRadius > canvas.width - paddleWidth){
+                    if(ballY > aiPaddleY && ballY < aiPaddleY + paddleHeight){
+                        ballSpeedX = -ballSpeedX;
+                    }
+                }
+
+                aiPaddleY = ballY - paddleHeight / 2;
+            }
+
+            canvas.addEventListener('mousemove', event => {
+                const canvasPosition = canvas.getBoundingClientRect();
+                playerPaddleY = event.clientY - canvasPosition.top - paddleHeight / 2;
+            });
+
+            function gameLoop(){
+                move();
+                drawGameElements();
+
+                requestAnimationFrame(gameLoop);
+            }
+
+            gameLoop();
+        </script>
+    </body>
+</html>
